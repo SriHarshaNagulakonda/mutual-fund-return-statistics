@@ -8,6 +8,7 @@ import Button from '@mui/material/Button';
 import DownloadIcon from '@mui/icons-material/Download';
 import Search from './Search';
 import Chart from './Chart';
+import RollingReturnsWrapper from './RollingReturnWrapper';
 
 const ChartWrapper = () => {
   const dispatch = useDispatch();
@@ -42,6 +43,7 @@ const ChartWrapper = () => {
           </Box>
         </Box>
       </Box>
+      <RollingReturnsWrapper navData={selectedFundData} />
     </>
   );
 };

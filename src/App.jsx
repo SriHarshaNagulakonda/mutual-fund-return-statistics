@@ -1,6 +1,7 @@
 import { Routes, Route } from "react-router-dom";
 import Layout from "./components/Layout";
 import ChartWrapper from "./components/ChartWrapper";
+import RollingReturnsWrapper from "./components/RollingReturnWrapper";
 
 function App() {
   
