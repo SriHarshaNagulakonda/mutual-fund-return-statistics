@@ -46,7 +46,7 @@ export const minMaxMeanMedian = (arr) => {
   const mean = arr.reduce((sum, value) => sum + value, 0) / n;
   const median = n % 2 ? sorted[Math.floor(n / 2)] : (sorted[n / 2 - 1] + sorted[n / 2]) / 2;
 
-  return [min, max, mean, median];
+  return [min.toFixed(2), max.toFixed(2), mean.toFixed(2), median.toFixed(2)];
 };
 
 export const findNavByDate = (data, targetDate) => {

@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import moment from 'moment';
 import { findNavByDate, findCAGRByNAV, minMaxMeanMedian } from '../utils';
+import Chart from 'react-apexcharts'
+import ReactApexChart from 'react-apexcharts';
 
 const calculateRollingReturns = (navData, rollingPeriod = 3, totalRange = 10) => {
   if (rollingPeriod > totalRange) {
@@ -13,7 +15,7 @@ const calculateRollingReturns = (navData, rollingPeriod = 3, totalRange = 10) =>
 
   const today = moment();
   const startDate = today.clone().subtract(12 * totalRange, 'months');
-  const [startDateNav, startDateIndex] = findNavByDate(navData, startDate.format('DD-MM-YYYY'));
+  let [startDateNav, startDateIndex] = findNavByDate(navData, startDate.format('DD-MM-YYYY'));
 
   if (!startDateNav) {
     return {
@@ -27,8 +29,11 @@ const calculateRollingReturns = (navData, rollingPeriod = 3, totalRange = 10) =>
   const [rollingEndDateNav, rollingEndIndex] = findNavByDate(navData, rollingEndDate.format('DD-MM-YYYY'));
 
   const rollingCAGRs = [];
+  const startDates = [];
   for (let endIndex = rollingEndIndex; endIndex >= 0; endIndex--) {
     const startNav = navData[startDateIndex]?.nav;
+    startDates.push(navData[startDateIndex]?.date);
+    startDateIndex -= 1;
     const endNav = navData[endIndex]?.nav;
     const cagr = findCAGRByNAV(startNav, endNav, rollingPeriod);
     rollingCAGRs.push(cagr);
@@ -58,13 +63,18 @@ const calculateRollingReturns = (navData, rollingPeriod = 3, totalRange = 10) =>
     medianCAGR: medianCagr,
     percentageDistribution: Object.fromEntries(
       Object.entries(percentageDistribution).map(([key, value]) => [key, parseFloat((value * 100 / rollingCAGRs.length).toFixed(2))])
-    )
+    ),
+    dates: startDates,
+    cagrs: rollingCAGRs
   };
 };
 
 // Usage in React component
 const RollingReturnsWrapper = ({ navData }) => {
   const [results, setResults] = useState(null);
+  const [options, setOptions] = useState(null);
+  const [series, setSeries] = useState(null);
+  const [rollingPeriod, setRollingPeriod] = useState("Rolling Returns 1Y CAGR");
 
   useEffect(() => {
     if (navData) {
@@ -73,12 +83,65 @@ const RollingReturnsWrapper = ({ navData }) => {
     }
   }, [navData]);
 
+  useEffect(() => {
+    setOptions({
+      chart: {
+        height: 500,
+        width: 1200,
+        type: 'line',
+        zoom: {
+          enabled: false
+        }
+      },
+      dataLabels: {
+        enabled: false
+      },
+      stroke: {
+        curve: 'smooth'
+      },
+      title: {
+        text: 'Rolling Returns CAGR%',
+        align: 'left'
+      },
+      grid: {
+        row: {
+          colors: ['#f3f3f3', 'transparent'], 
+          opacity: 0.5
+        },
+      },
+      xaxis: {
+        type: 'date',
+        categories: results?.dates // || ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep'],
+      },
+      annotations: {
+        yaxis: [
+          {
+            y: results?.avgCAGR,
+            borderColor: 'green',
+            label: {
+              text: 'Average: '+results?.avgCAGR+'%',
+              style: {
+                color: '#fff',
+                background: 'green'
+              }
+            }
+          }
+        ]
+      }  
+    });
+    setSeries([{
+      name: "Returns %",
+      data: results?.cagrs 
+    }])
+  }, [results]);
+
   return (
     <div>
-      {results && (
+      {series && (
         <div>
           <h3>Rolling Returns</h3>
-          <pre>{JSON.stringify(results, null, 2)}</pre>
+          {/* <pre>{JSON.stringify(series, null, 2)}</pre> */}
+          <ReactApexChart options={options} series={series} type="line" height={500} width={1200} />
         </div>
       )}
     </div>
