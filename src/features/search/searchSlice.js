@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { showToast } from "../../utils";
 
-const MFAPI_URL = "https://api.mfapi.in/mf/" // import.meta.env.VITE_MFAPI_URL;
+const MFAPI_URL = import.meta.env.VITE_MFAPI_URL;
 
 const initialState = {
   inputedText: "",
@@ -24,8 +24,6 @@ export const fetchMFSearchResults = createAsyncThunk("search/fetchMFSearchResult
     url: MFAPI_URL+`search?q=${formattedText}`,
     signal: controller.signal
   };
-
-  console.log(options);
 
   const res = await axios.request(options);
   return { text: formattedText, results: res.data };

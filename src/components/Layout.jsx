@@ -19,6 +19,22 @@ const Layout = () => {
         <Box sx={{ mt: "70px" }}>
           <Outlet />
           <Box sx={{ width: "100%", px: "15px", mt: "20px", alignItems: "center" }}>
+            <Link href="#" target="_blank" rel="noopener" sx={{ display: "flex", alignItems: "center", my: "10px", width: "fit-content" }}>
+              <Typography variant='h4' sx={{ fontFamily: "Exo" }}>What Are Rolling Returns in Mutual Funds?</Typography>
+            </Link>
+            <Typography variant="body1" paragraph>
+              Rolling returns are a powerful tool for understanding the consistency and reliability 
+              of a mutual fund’s performance over time. Unlike standard returns, which only show gains 
+              or losses for a single period (like 1 year or 5 years), rolling returns calculate the 
+              performance over multiple overlapping periods, such as a series of 1-year, 3-year, or 5-year intervals.
+            </Typography>
+            <Typography variant="body1" paragraph>
+              For example, a 5-year rolling return calculates performance for each 5-year period within 
+              a larger timeframe. This approach provides a more comprehensive view of the fund’s behavior 
+              through different market conditions. Rolling returns help investors evaluate long-term consistency, 
+              identify periods of high or low performance, and compare funds based on their reliability 
+              across varying market cycles.
+            </Typography>
             <Link href="https://github.com/anshuthopsee/india-mutual-fund" target="_blank" rel="noopener" sx={{ display: "flex", alignItems: "center", my: "10px", width: "fit-content" }}>
               <Typography variant='h4' sx={{ fontFamily: "Exo" }}>India Mutual Fund</Typography>
               <GitHubIcon sx={{ ml: "10px", fontSize: "30px", verticalAlign: "middle" }} />

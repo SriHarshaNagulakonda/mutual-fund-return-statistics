@@ -1,12 +1,9 @@
-import React, { useEffect } from 'react';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
+import React from 'react';
+import { Table, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
 
 const ReturnStatisticsTable = ({ results }) => {
   const { avgCAGR, minCAGR, maxCAGR, medianCAGR, percentageDistributionPercent } = results || {};
 
-  useEffect(() => {
-    console.log(percentageDistributionPercent,'percentageDistributionPercent');
-  }, [])
 
   return (
     <TableContainer component={Paper} style={{ marginLeft: 20, minWidth: 600 }}>

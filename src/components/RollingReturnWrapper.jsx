@@ -45,11 +45,9 @@ const calculateRollingReturns = (navData, rollingPeriod = 3, totalRange = 10) =>
   const [minCagr, maxCagr, meanCagr, medianCagr] = minMaxMeanMedian(rollingCAGRs);
   const percentageDistribution = {
     "<0%": 0, "0-8%": 0, "8-12%": 0, "12-15%": 0, "15-20%": 0, ">20%": 0
-    //, "above_avg": 0
   };
 
   rollingCAGRs.forEach(cagr => {
-    // if (cagr > meanCagr) percentageDistribution['above_avg']++;
     if (cagr < 0) percentageDistribution['<0%']++;
     else if (cagr <= 8) percentageDistribution['0-8%']++;
     else if (cagr <= 12) percentageDistribution['8-12%']++;
@@ -84,7 +82,6 @@ const RollingReturnsWrapper = ({ navData }) => {
   useEffect(() => {
     if (navData) {
       const calculatedReturns = calculateRollingReturns(navData, rollingPeriod);
-      console.log(calculatedReturns,'calculatedReturns');
       setResults(calculatedReturns);
     }
   }, [navData, rollingPeriod]);
@@ -192,8 +189,6 @@ const RollingReturnsWrapper = ({ navData }) => {
             </Select>
           </FormControl>
           <ReactApexChart options={options} series={series} type="line" height={500} width={1200} />
-          {/* {JSON.stringify(results?.percentageDistributionPercent) + ' results'}
-          {results?.cagrs?.length} */}
           <div style={{ display: 'flex', alignItems: 'start' }}>
             <div style={{ marginRight: 20 }}>
               {results?.cagrs?.length>0 && <RollingPercentageDistribution percentageDistribution={results?.percentageDistribution} />}
