@@ -1,76 +1,9 @@
 import { useEffect, useState } from 'react';
-import moment from 'moment';
-import { findNavByDate, findCAGRByNAV, minMaxMeanMedian } from '../utils';
-import Chart from 'react-apexcharts'
+import { calculateRollingReturns } from '../utils';
 import ReactApexChart from 'react-apexcharts';
 import { Select, MenuItem, InputLabel, FormControl } from '@mui/material';
 import RollingPercentageDistribution from './RollingPercentageDistribution';
 import ReturnStatisticsTable from './ReturnStatisticsTable';
-
-const calculateRollingReturns = (navData, rollingPeriod = 3, totalRange = 10) => {
-  if (rollingPeriod > totalRange) {
-    return {
-      message: 'Rolling Period exceeded',
-      statusCode: 403,
-      data: {}
-    };
-  }
-
-  const today = moment();
-  const startDate = today.clone().subtract(12 * totalRange, 'months');
-  let [startDateNav, startDateIndex] = findNavByDate(navData, startDate.format('DD-MM-YYYY'));
-
-  if (!startDateNav) {
-    return {
-      message: `Scheme is started on ${navData[navData.length - 1]?.date}`,
-      statusCode: 403,
-      data: {}
-    };
-  }
-
-  const rollingEndDate = today.clone().subtract(12 * (totalRange - rollingPeriod), 'months');
-  const [rollingEndDateNav, rollingEndIndex] = findNavByDate(navData, rollingEndDate.format('DD-MM-YYYY'));
-
-  const rollingCAGRs = [];
-  const startDates = [];
-  for (let endIndex = rollingEndIndex; endIndex >= 0; endIndex--) {
-    const startNav = navData[startDateIndex]?.nav;
-    startDates.push(navData[startDateIndex]?.date);
-    startDateIndex -= 1;
-    const endNav = navData[endIndex]?.nav;
-    const cagr = findCAGRByNAV(startNav, endNav, rollingPeriod);
-    rollingCAGRs.push(cagr);
-  }
-
-  const [minCagr, maxCagr, meanCagr, medianCagr] = minMaxMeanMedian(rollingCAGRs);
-  const percentageDistribution = {
-    "<0%": 0, "0-8%": 0, "8-12%": 0, "12-15%": 0, "15-20%": 0, ">20%": 0
-  };
-
-  rollingCAGRs.forEach(cagr => {
-    if (cagr < 0) percentageDistribution['<0%']++;
-    else if (cagr <= 8) percentageDistribution['0-8%']++;
-    else if (cagr <= 12) percentageDistribution['8-12%']++;
-    else if (cagr <= 15) percentageDistribution['12-15%']++;
-    else if (cagr <= 20) percentageDistribution['15-20%']++;
-    else percentageDistribution['>20%']++;
-  });
-
-  const todayNav = navData[0]?.nav;
-  return {
-    [`${totalRange}Y CAGR`]: findCAGRByNAV(startDateNav, todayNav, totalRange),
-    avgCAGR: meanCagr,
-    minCAGR: minCagr,
-    maxCAGR: maxCagr,
-    medianCAGR: medianCagr,
-    percentageDistribution: percentageDistribution,
-    percentageDistributionPercent: Object.fromEntries(
-      Object.entries(percentageDistribution).map(([key, value]) => [key, parseFloat((value * 100 / rollingCAGRs.length).toFixed(2))])
-    ),
-    dates: startDates,
-    cagrs: rollingCAGRs
-  };
-};
 
 // Usage in React component
 const RollingReturnsWrapper = ({ navData }) => {
@@ -87,7 +20,7 @@ const RollingReturnsWrapper = ({ navData }) => {
   }, [navData, rollingPeriod]);
 
   useEffect(() => {
-    if(results?.length==0){
+    if(!results){
       return;
     }
     setOptions({
@@ -116,9 +49,22 @@ const RollingReturnsWrapper = ({ navData }) => {
         },
       },
       xaxis: {
-        type: 'date',
-        categories: results?.dates // || ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep'],
-      },
+        type: 'date', 
+        categories: results?.dates, 
+        labels: {
+          show: true,
+          rotate: -45, 
+          datetimeUTC: false, 
+          format: 'dd MMM yyyy', 
+        },
+        tickAmount: Math.min(30, results?.dates?.length), 
+        tooltip: {
+          enabled: false,
+          formatter: function(value) {
+            return new Date(value).toLocaleDateString(); 
+          }
+        }
+      },      
       annotations: {
         yaxis: [
           {
@@ -160,7 +106,9 @@ const RollingReturnsWrapper = ({ navData }) => {
     setSeries([{
       name: "Returns %",
       data: results?.cagrs 
-    }])
+    }
+  ]
+  )
   }, [results, rollingPeriod]);
 
   const handlePeriodChange = (event) => {
