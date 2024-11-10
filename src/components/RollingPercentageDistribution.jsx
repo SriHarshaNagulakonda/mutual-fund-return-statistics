@@ -18,11 +18,23 @@ const RollingPercentageDistribution = ({percentageDistribution}) => {
       },
       labels: labels,
       title: {
-        text: 'Percentage Distribution',
+        text: 'Returns% Percentage Distribution',
         align: 'center'
       },
       legend: {
         position: 'bottom'
+      },
+      dataLabels: {
+        enabled: true,
+        formatter: (val, { seriesIndex, w }) => {
+          // Show label and percentage
+          return `${w.config.labels[seriesIndex]}: ${val.toFixed(2)}%`;
+        },
+        style: {
+          fontSize: '10px',
+          // fontWeight: 'bold',
+          // colors: ['#333'],
+        },
       }
     });
 
@@ -31,7 +43,7 @@ const RollingPercentageDistribution = ({percentageDistribution}) => {
 
   return (
     <div>
-      <ReactApexChart options={options} series={series} type="pie" width={380} />
+      <ReactApexChart options={options} series={series} type="pie" width={500} />
     </div>
   );
 };
