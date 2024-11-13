@@ -28,10 +28,10 @@ const RollingPercentageDistribution = ({percentageDistribution}) => {
         enabled: true,
         formatter: (val, { seriesIndex, w }) => {
           // Show label and percentage
-          return `${w.config.labels[seriesIndex]}: ${val.toFixed(2)}%`;
+          return `${w.config.labels[seriesIndex]}`;
         },
         style: {
-          fontSize: '10px',
+          fontSize: '14px',
           // fontWeight: 'bold',
           // colors: ['#333'],
         },

@@ -103,7 +103,7 @@ export const calculateRollingReturns = (navData, rollingPeriod = 3, totalRange =
   const startDates = [];
   for (let endIndex = rollingEndIndex; endIndex >= 0; endIndex--) {
     const startNav = navData[startDateIndex]?.nav;
-    startDates.push(navData[startDateIndex]?.date);
+    startDates.push(navData[endIndex]?.date);
     startDateIndex -= 1;
     const endNav = navData[endIndex]?.nav;
     const cagr = findCAGRByNAV(startNav, endNav, rollingPeriod);

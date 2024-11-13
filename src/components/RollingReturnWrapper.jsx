@@ -107,6 +107,10 @@ const RollingReturnsWrapper = ({ navData }) => {
       name: "Returns %",
       data: results?.cagrs 
     }
+    // ,{
+    //   name: "Returns -10  %",
+    //   data: results?.cagrs?.map(cagr => (cagr-10).toFixed(2))
+    // }
   ]
   )
   }, [results, rollingPeriod]);
