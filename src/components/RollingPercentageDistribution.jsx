@@ -14,7 +14,7 @@ const RollingPercentageDistribution = ({percentageDistribution}) => {
     setOptions({
       chart: {
         type: 'pie',
-        width: 500
+        width: 350
       },
       labels: labels,
       title: {
@@ -43,7 +43,7 @@ const RollingPercentageDistribution = ({percentageDistribution}) => {
 
   return (
     <div>
-      <ReactApexChart options={options} series={series} type="pie" width={500} />
+      <ReactApexChart options={options} series={series} type="pie" width={350} />
     </div>
   );
 };
