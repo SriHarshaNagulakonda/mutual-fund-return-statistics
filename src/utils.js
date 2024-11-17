@@ -51,6 +51,7 @@ export const minMaxMeanMedian = (arr) => {
 };
 
 export const findNavByDate = (data, targetDate) => {
+  console.log(targetDate);
   const target = new Date(targetDate.split("-").reverse().join("-"));
 
   let left = 0, right = data.length - 1;
@@ -76,6 +77,7 @@ export const findCAGRByNAV = (startNav, endNav, time) => {
 };
 
 export const calculateRollingReturns = (navData, rollingPeriod = 3, totalRange = 10) => {
+  console.log("navData", navData);
   if (rollingPeriod > totalRange) {
     return {
       message: 'Rolling Period exceeded',
@@ -87,6 +89,8 @@ export const calculateRollingReturns = (navData, rollingPeriod = 3, totalRange =
   const today = moment();
   const startDate = today.clone().subtract(12 * totalRange, 'months');
   let [startDateNav, startDateIndex] = findNavByDate(navData, startDate.format('DD-MM-YYYY'));
+
+  console.log(startDateIndex, startDateNav);
 
   if (!startDateNav) {
     return {

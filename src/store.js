@@ -43,8 +43,14 @@ const savedSelectedFund = JSON.parse(localStorage.getItem("selectedFund"));
 const savedAppTheme = JSON.parse(localStorage.getItem("appTheme"));
 
 const presetFund = {
-  schemeName: "HSBC Asia Pacific (Ex Japan) Dividend Yield Fund - Growth Direct",
-  schemeCode: "127071"
+  schemeName: [
+    "Parag Parikh Flexi Cap Fund - Direct Plan - Growth",
+    "quant Flexi Cap Fund - Growth Option-Direct Plan"
+  ],
+  schemeCode: [
+     "122639",
+     "120843"
+    ]
 };
 
 store.dispatch(fetchMFData(savedSelectedFund || presetFund));

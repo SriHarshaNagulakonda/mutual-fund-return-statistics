@@ -6,21 +6,27 @@ import RollingPercentageDistribution from './RollingPercentageDistribution';
 import ReturnStatisticsTable from './ReturnStatisticsTable';
 
 // Usage in React component
-const RollingReturnsWrapper = ({ navData }) => {
+const RollingReturnsWrapper = ({ navData, fundNames }) => {
   const [results, setResults] = useState(null);
   const [options, setOptions] = useState(null);
   const [series, setSeries] = useState(null);
-  const [rollingPeriod, setRollingPeriod] = useState("3");
+  const [rollingPeriod, setRollingPeriod] = useState("1");
 
   useEffect(() => {
-    if (navData) {
-      const calculatedReturns = calculateRollingReturns(navData, rollingPeriod);
-      setResults(calculatedReturns);
+    let navResults = [];
+    console.log(navData?.length);
+    if (navData?.length > 0) {
+      for (let i = 0; i < navData?.length; i++){
+        const calculatedReturns = calculateRollingReturns(navData[i]?.data, rollingPeriod);
+        navResults.push(calculatedReturns);
+      }
+      setResults(navResults);
     }
+    console.log("nav results", navResults);
   }, [navData, rollingPeriod]);
 
   useEffect(() => {
-    if(!results){
+    if(!results || results?.length==0){
       return;
     }
     setOptions({
@@ -50,14 +56,14 @@ const RollingReturnsWrapper = ({ navData }) => {
       },
       xaxis: {
         type: 'date', 
-        categories: results?.dates, 
+        categories: results[0]?.dates, 
         labels: {
           show: true,
-          rotate: -45, 
-          datetimeUTC: false, 
+          rotate: -45,
+          datetimeUTC: false,
           format: 'dd MMM yyyy', 
         },
-        tickAmount: Math.min(30, results?.dates?.length), 
+        tickAmount: Math.min(30, results[0]?.dates?.length), 
         tooltip: {
           enabled: false,
           formatter: function(value) {
@@ -65,54 +71,48 @@ const RollingReturnsWrapper = ({ navData }) => {
           }
         }
       },      
-      annotations: {
-        yaxis: [
-          {
-            y: results?.avgCAGR,
-            borderColor: 'green',
-            label: {
-              text: 'Average: '+results?.avgCAGR+'%',
-              style: {
-                color: '#fff',
-                background: 'green'
-              }
-            }
-          },
-          {
-            y: results?.minCAGR,
-            borderColor: 'red',
-            label: {
-              text: 'Lowest: '+results?.minCAGR+'%',
-              style: {
-                color: '#fff',
-                background: 'red'
-              }
-            }
-          },
-          {
-            y: results?.maxCAGR,
-            borderColor: 'red',
-            label: {
-              text: 'Highest: '+results?.maxCAGR+'%',
-              style: {
-                color: '#fff',
-                background: 'red'
-              }
-            }
-          }
-        ]
-      }  
+      // annotations: {
+      //   yaxis: [
+      //     {
+      //       y: results?.avgCAGR,
+      //       borderColor: 'green',
+      //       label: {
+      //         text: 'Average: '+results?.avgCAGR+'%',
+      //         style: {
+      //           color: '#fff',
+      //           background: 'green'
+      //         }
+      //       }
+      //     },
+      //     {
+      //       y: results?.minCAGR,
+      //       borderColor: 'red',
+      //       label: {
+      //         text: 'Lowest: '+results?.minCAGR+'%',
+      //         style: {
+      //           color: '#fff',
+      //           background: 'red'
+      //         }
+      //       }
+      //     },
+      //     {
+      //       y: results?.maxCAGR,
+      //       borderColor: 'red',
+      //       label: {
+      //         text: 'Highest: '+results?.maxCAGR+'%',
+      //         style: {
+      //           color: '#fff',
+      //           background: 'red'
+      //         }
+      //       }
+      //     }
+      //   ]
+      // }  
     });
-    setSeries([{
-      name: "Returns %",
-      data: results?.cagrs 
-    }
-    // ,{
-    //   name: "Returns -10  %",
-    //   data: results?.cagrs?.map(cagr => (cagr-10).toFixed(2))
-    // }
-  ]
-  )
+    setSeries(results.map((result, index) => {return {
+      name: `${fundNames[index]}`,
+      data: result?.cagrs
+    }}));
   }, [results, rollingPeriod]);
 
   const handlePeriodChange = (event) => {
@@ -145,9 +145,8 @@ const RollingReturnsWrapper = ({ navData }) => {
             <div style={{ marginRight: 20 }}>
               {results?.cagrs?.length>0 && <RollingPercentageDistribution percentageDistribution={results?.percentageDistribution} />}
             </div>
-            {results?.cagrs?.length>0 && <ReturnStatisticsTable results={results} />}
+            {results?.length>0 && <ReturnStatisticsTable fundNames={fundNames} results={results} />}
           </div>
-
         </div>
       )}
     </div>

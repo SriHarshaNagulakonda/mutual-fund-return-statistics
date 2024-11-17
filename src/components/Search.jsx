@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { getResults, fetchMFSearchResults, getInputedText, getSearchStatus, getMemoizedResults, setResults, clearResults, setInputedText, controller } from '../features/search/searchSlice';
-import { getSelectedFundName, fetchMFData } from '../features/selected/selectedSlice';
+import { getSelectedFundName, fetchMFData, getSelectedFundCode } from '../features/selected/selectedSlice';
 import TextField from '@mui/material/TextField';
 import Box from '@mui/material/Box';
 import Autocomplete from '@mui/material/Autocomplete';
@@ -18,7 +18,8 @@ const Search = () => {
   const results = useSelector(getResults);
   const searchStatus = useSelector(getSearchStatus);
   const memoizedResults = useSelector(getMemoizedResults);
-  const fundName = useSelector(getSelectedFundName);
+  const fundNames = useSelector(getSelectedFundName);
+  const fundCodes = useSelector(getSelectedFundCode);
 
   const handleChange = (e) => {
     const text = e.target.value.trimStart().replace(/\s+/g, " ");
@@ -55,9 +56,12 @@ const Search = () => {
   };
 
   const handleFundSelect = (e, option) => {
-    if (option.schemeName !== fundName) {
-      dispatch(fetchMFData({...option}));
-    };
+    if (!fundNames.includes(option.schemeName)) {
+      console.log("option", option);
+      dispatch(fetchMFData({schemeName:[...fundNames,option.schemeName], schemeCode: [...fundCodes,option.schemeCode]}));
+    } else {
+      dispatch(fetchMFData({schemeName: fundNames.filter(fundName => fundName!=option.schemeName), schemeCode: fundCodes.filter(fundCode => fundCode!=option.schemeCode )}));
+    }
   };
 
   return (
@@ -91,9 +95,9 @@ const Search = () => {
           />
         )}
         renderOption={(props, option) => {
-          const isSelected = option.schemeName === fundName;
+          const isSelected = fundNames.includes(option.schemeName);
           return (
-            <Box key={option.schemeName} {...props} sx={{ position: "relative", width: "100%", pointerEvents: isSelected ? "none" : "auto", borderBottom: 1, borderBottomColor: "border.secondary" }}>
+            <Box key={option.schemeName} {...props} sx={{ position: "relative", width: "100%", pointerEvents: isSelected ? "auto" : "auto", borderBottom: 1, borderBottomColor: "border.secondary" }}>
               <span>{option.schemeName}</span>
               {isSelected ?
                 <CheckIcon sx={{ marginLeft: "auto", color: "accent.secondary" }} /> :

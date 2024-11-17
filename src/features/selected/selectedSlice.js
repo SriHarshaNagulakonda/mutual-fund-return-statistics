@@ -3,8 +3,8 @@ import { enqueueSnackbar } from 'notistack';
 import axios from 'axios';
 
 const initialState = {
-  schemeName: "",
-  schemeCode: "",
+  schemeName: [],
+  schemeCode: [],
   data: [],
   status: "idle", //'idle' | 'loading' | 'succeeded' | 'failed',
 };
@@ -19,15 +19,30 @@ const clearToast = () => {
   clearTimeout(fetchResponseTimer);
 };
 
-export const fetchMFData = createAsyncThunk("selected/fetchMFData", async (fund) => {
+export const fetchMFData = createAsyncThunk("selected/fetchMFData", async (payload) => {
 
-  const options = {
-    method: 'GET',
-    url: `https://api.mfapi.in/mf/${fund.schemeCode}`,
-  };
+  // console.log(fund,"============fund===================");
 
-  const res = await axios.request(options);
-  return res.data;
+  const data = [];
+
+  const schemeCodes = payload.schemeCode;
+  console.log("schemeCodes: " + schemeCodes);
+  // console.log(schemeCodes.length);
+
+  for (let i = 0; i <schemeCodes?.length; i++) {
+    console.log(schemeCodes[i]);
+    const fundCode = schemeCodes[i];
+    const options = {
+      method: 'GET',
+      url: `https://api.mfapi.in/mf/${fundCode}`,
+    };
+
+    const res = await axios.request(options);
+    console.log("res.data", res.data);
+    data.push(res.data);
+  }
+  console.log("data: " + data);
+  return data;
 });
 
 const selectedSlice = createSlice({
@@ -56,7 +71,7 @@ const selectedSlice = createSlice({
         }, 3000);
       })
       .addCase(fetchMFData.fulfilled, (state, action) => {
-          state.data = action.payload.data;
+          state.data = action["payload"];
           state.status = "succeeded";
           clearTimeout(fetchResponseTimer);
       })
