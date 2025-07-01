@@ -75,18 +75,42 @@ export const findCAGRByNAV = (startNav, endNav, time) => {
   return parseFloat((((endNav / startNav) ** (1 / time) - 1) * 100).toFixed(2));
 };
 
-export const calculateRollingReturns = (navData, rollingPeriod = 3, totalRange = 10) => {
-  if (rollingPeriod > totalRange) {
+export const calculateRollingReturns = (
+  navData,
+  rollingPeriod = 3,
+  totalRange = 10,
+  startDate = null
+) => {
+  const today = moment();
+
+  let startDateMoment;
+  if (startDate) {
+    startDateMoment = moment(startDate, 'DD-MM-YYYY');
+    if (!startDateMoment.isValid()) {
+      return {
+        message: `Invalid start date: ${startDate}`,
+        statusCode: 403,
+        data: {}
+      };
+    }
+  } else if (totalRange === -1) {
+    const lastDate = navData[navData.length - 1]?.date;
+    startDateMoment = moment(lastDate, 'DD-MM-YYYY');
+  } else {
+    startDateMoment = today.clone().subtract(totalRange * 12, 'months');
+  }
+
+  const durationYears = today.diff(startDateMoment, 'months') / 12;
+
+  if (rollingPeriod > durationYears) {
     return {
-      message: 'Rolling Period exceeded',
+      message: `Rolling period (${rollingPeriod}Y) exceeds available range (${durationYears.toFixed(2)}Y)`,
       statusCode: 403,
       data: {}
     };
   }
 
-  const today = moment();
-  const startDate = today.clone().subtract(12 * totalRange, 'months');
-  let [startDateNav, startDateIndex] = findNavByDate(navData, startDate.format('DD-MM-YYYY'));
+  const [startDateNav, startDateIndex] = findNavByDate(navData, startDateMoment.format('DD-MM-YYYY'));
 
   if (!startDateNav) {
     return {
@@ -96,21 +120,25 @@ export const calculateRollingReturns = (navData, rollingPeriod = 3, totalRange =
     };
   }
 
-  const rollingEndDate = today.clone().subtract(12 * (totalRange - rollingPeriod), 'months');
-  const [rollingEndDateNav, rollingEndIndex] = findNavByDate(navData, rollingEndDate.format('DD-MM-YYYY'));
+  const rollingEndMoment = startDateMoment.clone().add(rollingPeriod * 12, 'months');
+  const [rollingEndDateNav, rollingEndIndex] = findNavByDate(navData, rollingEndMoment.format('DD-MM-YYYY'));
 
   const rollingCAGRs = [];
   const startDates = [];
-  for (let endIndex = rollingEndIndex; endIndex >= 0; endIndex--) {
-    const startNav = navData[startDateIndex]?.nav;
-    startDates.push(navData[endIndex]?.date);
-    startDateIndex -= 1;
+
+  let currStartIndex = startDateIndex;
+  for (let endIndex = rollingEndIndex; endIndex >= 0 && currStartIndex >= 0; endIndex--) {
+    const startNav = navData[currStartIndex]?.nav;
     const endNav = navData[endIndex]?.nav;
     const cagr = findCAGRByNAV(startNav, endNav, rollingPeriod);
+
     rollingCAGRs.push(cagr);
+    startDates.push(navData[endIndex]?.date);
+    currStartIndex--;
   }
 
   const [minCagr, maxCagr, meanCagr, medianCagr] = minMaxMeanMedian(rollingCAGRs);
+
   const percentageDistribution = {
     "<0%": 0, "0-8%": 0, "8-12%": 0, "12-15%": 0, "15-20%": 0, ">20%": 0
   };
@@ -125,15 +153,19 @@ export const calculateRollingReturns = (navData, rollingPeriod = 3, totalRange =
   });
 
   const todayNav = navData[0]?.nav;
+
   return {
-    [`${totalRange}Y CAGR`]: findCAGRByNAV(startDateNav, todayNav, totalRange),
+    [`${durationYears.toFixed(2)}Y CAGR`]: findCAGRByNAV(startDateNav, todayNav, durationYears),
     avgCAGR: meanCagr,
     minCAGR: minCagr,
     maxCAGR: maxCagr,
     medianCAGR: medianCagr,
-    percentageDistribution: percentageDistribution,
+    percentageDistribution,
     percentageDistributionPercent: Object.fromEntries(
-      Object.entries(percentageDistribution).map(([key, value]) => [key, parseFloat((value * 100 / rollingCAGRs.length).toFixed(2))])
+      Object.entries(percentageDistribution).map(([key, val]) => [
+        key,
+        parseFloat((val * 100 / rollingCAGRs.length).toFixed(2))
+      ])
     ),
     dates: startDates,
     cagrs: rollingCAGRs
