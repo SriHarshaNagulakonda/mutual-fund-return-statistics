@@ -76,11 +76,6 @@ export const findCAGRByNAV = (startNav, endNav, time) => {
   return parseFloat((((endNav / startNav) ** (1 / time) - 1) * 100).toFixed(2));
 };
 
-<<<<<<< HEAD
-export const calculateRollingReturns = (navData, rollingPeriod = 3, totalRange = 10) => {
-  console.log("navData", navData);
-  if (rollingPeriod > totalRange) {
-=======
 export const calculateRollingReturns = (
   navData,
   rollingPeriod = 3,
@@ -109,7 +104,6 @@ export const calculateRollingReturns = (
   const durationYears = today.diff(startDateMoment, 'months') / 12;
 
   if (rollingPeriod > durationYears) {
->>>>>>> table-realign
     return {
       message: `Rolling period (${rollingPeriod}Y) exceeds available range (${durationYears.toFixed(2)}Y)`,
       statusCode: 403,
