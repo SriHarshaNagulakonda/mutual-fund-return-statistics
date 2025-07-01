@@ -3,6 +3,8 @@ import axios from "axios";
 import { showToast } from "../../utils";
 
 const MFAPI_URL = import.meta.env.VITE_MFAPI_URL;
+// const MFAPI_URL = "https://api.mfapi.in/mf/" // import.meta.env.VITE_MFAPI_URL;
+
 
 const initialState = {
   inputedText: "",

@@ -9,25 +9,48 @@ const ReturnStatisticsTable = ({ results, fundNames }) => {
       <Table>
         <TableHead>
           <TableRow>
-            <TableCell colSpan={5} align="center" sx={{ borderRight: '1px solid black' }}>
+            <TableCell colSpan={2} align="center">
               <strong>Return Statistics %</strong>
             </TableCell>
-            <TableCell colSpan={6} align="center">
+            <TableCell colSpan={2} align="center">
               <strong>Return Distribution (% of times)</strong>
             </TableCell>
           </TableRow>
           <TableRow>
-            <TableCell><strong>Name</strong></TableCell>
-            <TableCell><strong>Avg CAGR</strong></TableCell>
-            <TableCell><strong>Min CAGR</strong></TableCell>
-            <TableCell><strong>Max CAGR</strong></TableCell>
-            <TableCell sx={{ borderRight: '1px solid black' }}><strong>Median CAGR</strong></TableCell>
-            <TableCell><strong>{'<0%'}</strong></TableCell>
-            <TableCell><strong>{'0-8%'}</strong></TableCell>
-            <TableCell><strong>{'8-12%'}</strong></TableCell>
-            <TableCell><strong>{'12-15%'}</strong></TableCell>
-            <TableCell><strong>{'15-20%'}</strong></TableCell>
-            <TableCell><strong>{'>20%'}</strong></TableCell>
+            <TableCell>Avg CAGR</TableCell>
+            <TableCell>{avgCAGR || '-'}</TableCell>
+            <TableCell>{'<0%'}</TableCell>
+            <TableCell>{percentageDistributionPercent['<0%'] || '-'}</TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell>Min CAGR</TableCell>
+            <TableCell>{minCAGR || '-'}</TableCell>
+            <TableCell>{'0-8%'}</TableCell>
+            <TableCell>{percentageDistributionPercent['0-8%'] || '-'}</TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell>Max CAGR</TableCell>
+            <TableCell>{maxCAGR || '-'}</TableCell>
+            <TableCell>{'8-12%'}</TableCell>
+            <TableCell>{percentageDistributionPercent['8-12%'] || '-'}</TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell>Median CAGR</TableCell>
+            <TableCell>{medianCAGR || '-'}</TableCell>
+            <TableCell>{'12-15%'}</TableCell>
+            <TableCell>{percentageDistributionPercent['12-15%'] || '-'}</TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell></TableCell>
+            <TableCell></TableCell>
+            <TableCell>{'15-20%'}</TableCell>
+            <TableCell>{percentageDistributionPercent['15-20%'] || '-'}</TableCell>
+          </TableRow>
+          <TableRow>
+            <TableCell></TableCell>
+            <TableCell></TableCell>
+            <TableCell>{'>20%'}</TableCell>
+            <TableCell>{percentageDistributionPercent['>20%'] || '-'}</TableCell>
           </TableRow>
           </TableHead>
           {results?.map((row, index) =>  (<TableRow>
